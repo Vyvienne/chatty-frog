@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Chatty Frog</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <div class="container"></div>
+    <script src="chatty-frog.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+        function ChatInput() {
+            return (
+                <>
+                    <input
+                        placeholder="Enter your message"
+                        size="30"
+                    />
+                    <button>Send</button>
+                </>
+            );
+        }
+
+        function ChatMessage({ message, sender }) {
+
+            // if (sender === 'frog') {
+            //     return (
+            //         <div>
+            //             <img src="frog.png" width="50" />
+            //             {message}
+            //         </div>
+            //     );
+            // }
+
+            return (
+                <div>
+                    {sender === 'frog' ? (
+                        <img src="frog.png" width="50" />
+                    ) : null}
+                    {message}
+                    {sender === 'user' ? (
+                        <img src="user.png" width="50" />
+                    ) : null}
+                </div>
+            );
+        }
+
+        function App() {
+            return (
+                <>
+                    <h1>Chatty Frog</h1>
+                    <ChatInput />
+                    <ChatMessage
+                        message="Hello, World!"
+                        sender="user"
+                    />
+                    <ChatMessage
+                        message="Hi, how are you?"
+                        sender="frog"
+                    />
+                </>
+            );
+        }
+
+        const container = document.querySelector('.container');
+        ReactDOM.createRoot(container).render(<App />);
+
+    </script>
+
+</body>
+
+</html>
