@@ -4,6 +4,7 @@
 <head>
     <title>Chatty Frog</title>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -37,31 +38,41 @@
             }
 
             return (
-                <>
+                <div className="chat-input-container">
                     <input
                         placeholder="Enter your message"
                         size="30"
                         onChange={saveInputText}
                         value={inputText}
+                        className="chat-input"
                     />
                     <button
                         onClick={sendMessage}
+                        className="send-button"
                     >
                         Send
                     </button>
-                </>
+                </div>
             );
         }
 
         function ChatMessage({ message, sender }) {
             return (
-                <div>
+                <div className={
+                    sender === 'frog' ?
+                        "chat-message-frog" :
+                        "chat-message-user"
+                }>
                     {sender === 'frog' ? (
-                        <img src="frog.png" width="50" />
+                        <img src="frog.png"
+                            className="chat-message-image" />
                     ) : null}
-                    {message}
+                    <div className="chat-message-text">
+                        {message}
+                    </div>
                     {sender === 'user' ? (
-                        <img src="user.png" width="50" />
+                        <img src="user.png"
+                            className="chat-message-image" />
                     ) : null}
                 </div>
             );
@@ -77,19 +88,17 @@
             const [chatMessages, setChatMessages] = array;
             */
 
-            const messages = chatMessages.map((chatMessages) => {
-                return (
-                    <>
+            return (
+                <div className="chat-messages-container">
+                    {chatMessages.map((msg) => (
                         <ChatMessage
-                            message={chatMessages.message}
-                            sender={chatMessages.sender}
-                            key={chatMessages.id}
+                            key={msg.id}
+                            message={msg.message}
+                            sender={msg.sender}
                         />
-                    </>
-                );
-            })
-
-            return (messages);
+                    ))}
+                </div>
+            );
         }
 
         function App() {
@@ -99,11 +108,10 @@
             const [chatMessages, setChatMessages] = React.useState([
             ]);
             return (
-                <>
-                    <h1>Chatty Frog</h1>
-                    <ChatInput chatMessages={chatMessages} setChatMessages={setChatMessages} />
+                <div className="app-container">
                     <ChatMessages chatMessages={chatMessages} />
-                </>
+                    <ChatInput chatMessages={chatMessages} setChatMessages={setChatMessages} />
+                </div>
             );
         }
 
