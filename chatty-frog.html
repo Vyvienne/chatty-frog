@@ -23,6 +23,7 @@
             }
 
             function sendMessage() {
+                if (!inputText.trim()) return; // prevent empty messages
 
                 const newChatMessages = [...chatMessages, { message: inputText, sender: "user", id: crypto.randomUUID() }];
 
@@ -37,12 +38,20 @@
                 setInputText('');
             }
 
+            function handleKeyDown(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // prevent line break
+                    sendMessage();
+                }
+            }
+
             return (
                 <div className="chat-input-container">
                     <input
                         placeholder="Enter your message"
                         size="30"
                         onChange={saveInputText}
+                        onKeyDown={handleKeyDown}
                         value={inputText}
                         className="chat-input"
                     />
@@ -88,8 +97,16 @@
             const [chatMessages, setChatMessages] = array;
             */
 
+            const chatMessagesRef = React.useRef(null);
+            React.useEffect(() => {
+                const containerElement = chatMessagesRef.current;
+                if (containerElement) {
+                    containerElement.scrollTop = containerElement.scrollHeight;
+                }
+            }, [chatMessages]);
+
             return (
-                <div className="chat-messages-container">
+                <div className="chat-messages-container" ref={chatMessagesRef}>
                     {chatMessages.map((msg) => (
                         <ChatMessage
                             key={msg.id}
