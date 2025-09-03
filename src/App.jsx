@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Chattyfrog } from 'supersimpledev'
+import ChattyfrogImg from './assets/frog.png'
+import UserImg from './assets/user.png'
 import './App.css'
 
 function ChatInput({ chatMessages, setChatMessages }) {
@@ -60,14 +62,14 @@ function ChatMessage({ message, sender }) {
         "chat-message-user"
     }>
       {sender === 'frog' ? (
-        <img src="frog.png"
+        <img src={ChattyfrogImg}
           className="chat-message-image" />
       ) : null}
       <div className="chat-message-text">
         {message}
       </div>
       {sender === 'user' ? (
-        <img src="user.png"
+        <img src={UserImg}
           className="chat-message-image" />
       ) : null}
     </div>
