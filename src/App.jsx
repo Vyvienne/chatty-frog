@@ -1,35 +1,123 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useRef, useEffect } from 'react'
+import { Chattyfrog } from 'supersimpledev'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+function ChatInput({ chatMessages, setChatMessages }) {
+  const [inputText, setInputText] = useState('');
+
+  function saveInputText(event) {
+    setInputText(event.target.value);
+  }
+
+  function sendMessage() {
+    if (!inputText.trim()) return; // prevent empty messages
+
+    const newChatMessages = [...chatMessages, { message: inputText, sender: "user", id: crypto.randomUUID() }];
+
+    setChatMessages(newChatMessages);
+
+    const response = Chattyfrog.getResponse(inputText);
+    setChatMessages([
+      ...newChatMessages,
+      { message: response, sender: "frog", id: crypto.randomUUID() }
+    ]);
+
+    setInputText('');
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // prevent line break
+      sendMessage();
+    }
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="chat-input-container">
+      <input
+        placeholder="Enter your message"
+        size="30"
+        onChange={saveInputText}
+        onKeyDown={handleKeyDown}
+        value={inputText}
+        className="chat-input"
+      />
+      <button
+        onClick={sendMessage}
+        className="send-button"
+      >
+        Send
+      </button>
+    </div>
+  );
+}
+
+function ChatMessage({ message, sender }) {
+  return (
+    <div className={
+      sender === 'frog' ?
+        "chat-message-frog" :
+        "chat-message-user"
+    }>
+      {sender === 'frog' ? (
+        <img src="frog.png"
+          className="chat-message-image" />
+      ) : null}
+      <div className="chat-message-text">
+        {message}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      {sender === 'user' ? (
+        <img src="user.png"
+          className="chat-message-image" />
+      ) : null}
+    </div>
+  );
+}
+
+function ChatMessages({ chatMessages }) {
+  /*
+  // Original data
+  const chatMessages = array[0];            
+  // Function to copy the original data and update the state
+  const setChatMessages = array[1];
+  
+  const [chatMessages, setChatMessages] = array;
+  */
+
+  const chatMessagesRef = useRef(null);
+  useEffect(() => {
+    const containerElement = chatMessagesRef.current;
+    if (containerElement) {
+      containerElement.scrollTop = containerElement.scrollHeight;
+    }
+  }, [chatMessages]);
+
+  return (
+    <div className="chat-messages-container" ref={chatMessagesRef}>
+      {chatMessages.map((msg) => (
+        <ChatMessage
+          key={msg.id}
+          message={msg.message}
+          sender={msg.sender}
+        />
+      ))}
+    </div>
+  );
+}
+
+
+function App() {
+
+  // Using React.useState to convert data to state
+  // Array destructuring to get the state variable and the function to update it
+  const [chatMessages, setChatMessages] = useState([
+  ]);
+  return (
+    <div className="app-container">
+      <ChatMessages chatMessages={chatMessages} />
+      <ChatInput chatMessages={chatMessages} setChatMessages={setChatMessages} />
+    </div>
+  );
 }
 
 export default App
