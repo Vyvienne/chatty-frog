@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Chattyfrog } from 'supersimpledev'
+import { Chattyfrog } from './ChattyFrog.js'
 import './ChatInput.css'
 
 export function ChatInput({ chatMessages, setChatMessages }) {
