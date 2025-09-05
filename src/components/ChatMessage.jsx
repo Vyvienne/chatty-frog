@@ -1,5 +1,6 @@
 import ChattyfrogImg from '../assets/frog.png'
 import UserImg from '../assets/user.png'
+import './ChatMessage.css'
 
 export function ChatMessage({ message, sender }) {
     return (
