@@ -1,9 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Chattyfrog } from './ChattyFrog.js'
 import './ChatInput.css'
 
 export function ChatInput({ setChatMessages }) {
     const [inputText, setInputText] = useState('');
+
+    // Load knowledge once when component mounts
+    useEffect(() => {
+        async function initFrog() {
+            await Chattyfrog.loadKnowledge();
+            console.log("Chattyfrog is ready with nature knowledge 🐸🌿");
+        }
+        initFrog();
+    }, []);
 
     function saveInputText(event) {
         setInputText(event.target.value);

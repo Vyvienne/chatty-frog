@@ -1,4 +1,16 @@
 const Chattyfrog = {
+    knowledge: [],
+
+    async loadKnowledge() {
+        try {
+            const res = await fetch("/nature_knowledge.json");
+            this.knowledge = await res.json();
+        } catch (err) {
+            console.error("Failed to load knowledge:", err);
+            this.knowledge = [];
+        }
+    },
+
     // Regex-based responses
     responses: [
         {
@@ -43,6 +55,23 @@ const Chattyfrog = {
         return message.toLowerCase().replace(/[^\w\s]/gi, "").trim();
     },
 
+    // Simple similarity scoring
+    similarity(a, b) {
+        const aWords = new Set(a.split(" "));
+        const bWords = new Set(b.split(" "));
+        const intersection = [...aWords].filter(x => bWords.has(x));
+        return intersection.length / Math.max(aWords.size, bWords.size);
+    },
+
+    findBestMatch(message) {
+        let best = { score: 0, answer: null };
+        for (const { question, answer } of this.knowledge) {
+            const score = this.similarity(this.normalize(message), this.normalize(question));
+            if (score > best.score) best = { score, answer };
+        }
+        return best.score > 0.3 ? best.answer : null; // adjust threshold
+    },
+
     // Core response handler
     getResponse(message) {
         if (!message) return this.emptyMessageResponse;
@@ -55,7 +84,11 @@ const Chattyfrog = {
             }
         }
 
-        return this.unsuccessfulResponse;
+        // Check knowledge base
+        const kbAnswer = this.findBestMatch(message);
+        return kbAnswer || "Hmm, I don't know that one yet 🐸 Maybe you can teach me?";
+
+        // return this.unsuccessfulResponse;
     },
 
     getResponseAsync(message) {
