@@ -1,74 +1,134 @@
-import { useState, useEffect } from 'react'
-import { Chattyfrog } from './ChattyFrog.js'
-import './ChatInput.css'
+import React, { useState, useRef, useEffect } from 'react';
+import { Chattyfrog } from './ChattyFrog.js';
+import './ChatInput.css';
 
-export function ChatInput({ setChatMessages }) {
+export function ChatInput({ chatMessages, setChatMessages, isGenerating, setIsGenerating, prefillInput }) {
     const [inputText, setInputText] = useState('');
+    const inputRef = useRef(null);
 
-    // Load knowledge once when component mounts
+    // If a suggestion chip is clicked from the Header
     useEffect(() => {
-        async function initFrog() {
-            await Chattyfrog.loadKnowledge();
-            console.log("Chattyfrog is ready with nature knowledge 🐸🌿");
+        if (prefillInput) {
+            setInputText(prefillInput);
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
         }
-        initFrog();
-    }, []);
+    }, [prefillInput]);
 
-    function saveInputText(event) {
+    function handleInputChange(event) {
         setInputText(event.target.value);
     }
 
-    async function sendMessage() {
-        if (!inputText.trim()) return; // prevent empty messages
+    async function sendMessage(textToSend) {
+        const text = (typeof textToSend === 'string' ? textToSend : inputText).trim();
+        if (!text || isGenerating) return;
 
-        // Add user message immediately
-        const userMessage = { message: inputText, sender: "user", id: crypto.randomUUID() };
-        setChatMessages(prev => [...prev, userMessage]);
+        // 1. Append user message
+        const userMessage = {
+            id: crypto.randomUUID(),
+            sender: "user",
+            message: text
+        };
 
-        // clear input
+        // 2. Prepare pending frog message with typing indicator
+        const frogMessageId = crypto.randomUUID();
+        const placeholderFrogMessage = {
+            id: frogMessageId,
+            sender: "frog",
+            message: "",
+            isStreaming: true,
+            isTyping: true
+        };
+
+        // Snapshot current history before state updates
+        const historySnapshot = [...chatMessages];
+
+        setChatMessages(prev => [...prev, userMessage, placeholderFrogMessage]);
         setInputText('');
+        setIsGenerating(true);
 
-        // Optional: show a placeholder for Chattyfrog
-        const typingMessage = { message: "Processing...", sender: "frog", id: crypto.randomUUID(), typing: true };
-        setChatMessages(prev => [...prev, typingMessage]);
-
-        // Wait for Chattyfrog's response (with natural delay)
-        const response = await Chattyfrog.getResponseAsync(inputText);
-
-        // Replace the typing placeholder with real response
-        setChatMessages(prev =>
-            prev.map(msg =>
-                msg.id === typingMessage.id
-                    ? { ...msg, message: response, typing: false }
-                    : msg
-            )
-        );
+        try {
+            // Stream tokens from Chatty Frog (WebLLM or fallback)
+            await Chattyfrog.replyStream({
+                message: text,
+                history: historySnapshot,
+                onDelta: (_delta, accumulatedText) => {
+                    setChatMessages(prev =>
+                        prev.map(msg =>
+                            msg.id === frogMessageId
+                                ? { ...msg, message: accumulatedText, isTyping: false }
+                                : msg
+                        )
+                    );
+                }
+            });
+        } catch (error) {
+            console.error("Failed to generate response:", error);
+            setChatMessages(prev =>
+                prev.map(msg =>
+                    msg.id === frogMessageId
+                        ? { ...msg, message: "*Ribbit!* Something made a splash in the pond water and I lost my train of thought. Could you ask me again? 🐸", isTyping: false }
+                        : msg
+                )
+            );
+        } finally {
+            // Finalize streaming state
+            setChatMessages(prev =>
+                prev.map(msg =>
+                    msg.id === frogMessageId
+                        ? { ...msg, isStreaming: false, isTyping: false }
+                        : msg
+                )
+            );
+            setIsGenerating(false);
+            if (inputRef.current) {
+                inputRef.current.focus();
+            }
+        }
     }
 
-
     function handleKeyDown(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // prevent line break
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
             sendMessage();
         }
     }
 
     return (
-        <div className="chat-input-container">
-            <input
-                placeholder="Enter your message"
-                size="30"
-                onChange={saveInputText}
-                onKeyDown={handleKeyDown}
-                value={inputText}
-                className="chat-input"
-            />
-            <button
-                onClick={sendMessage}
-                className="send-button"
-            >
-                Send
-            </button>
+        <div className="chat-input-wrapper">
+            <div className={`chat-input-container ${isGenerating ? 'disabled' : ''}`}>
+                <input
+                    ref={inputRef}
+                    placeholder={isGenerating ? "Chatty Frog is thinking..." : "Ask Chatty Frog about nature, weather, or anything..."}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    value={inputText}
+                    disabled={isGenerating}
+                    className="chat-input"
+                    aria-label="Message Chatty Frog"
+                />
+                <button
+                    onClick={() => sendMessage()}
+                    disabled={!inputText.trim() || isGenerating}
+                    className="send-button"
+                    title="Send message (Enter)"
+                    aria-label="Send message"
+                >
+                    {isGenerating ? (
+                        <span className="btn-spinner" />
+                    ) : (
+                        <svg className="send-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                        </svg>
+                    )}
+                </button>
+            </div>
+            <div className="input-footer-hint">
+                <span>Press <strong>Enter</strong> to send • Free & local WebGPU in your browser</span>
+            </div>
         </div>
     );
 }
+
+export default ChatInput;

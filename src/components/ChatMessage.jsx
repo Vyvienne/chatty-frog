@@ -1,25 +1,44 @@
-import ChattyfrogImg from '../assets/frog.png'
-import UserImg from '../assets/user.png'
-import './ChatMessage.css'
+import React from 'react';
+import ChattyfrogImg from '../assets/frog.png';
+import UserImg from '../assets/user.png';
+import './ChatMessage.css';
 
-export function ChatMessage({ message, sender }) {
+export function ChatMessage({ message, sender, isStreaming, isTyping }) {
+    const isFrog = sender === 'frog';
+
     return (
-        <div className={
-            sender === 'frog' ?
-                "chat-message-frog" :
-                "chat-message-user"
-        }>
-            {sender === 'frog' ? (
-                <img src={ChattyfrogImg}
-                    className="chat-message-image" />
-            ) : null}
-            <div className="chat-message-text">
-                {message}
+        <div className={`chat-message-row ${isFrog ? "chat-message-frog" : "chat-message-user"}`}>
+            {isFrog && (
+                <div className="avatar-container">
+                    <img src={ChattyfrogImg} alt="Chatty Frog" className="chat-message-image" />
+                </div>
+            )}
+            <div className={`chat-message-bubble ${isFrog ? "bubble-frog" : "bubble-user"}`}>
+                <div className="sender-tag">
+                    {isFrog ? "Chatty Frog" : "You"}
+                </div>
+                
+                {isTyping && !message ? (
+                    <div className="typing-indicator" aria-label="Chatty Frog is thinking">
+                        <span className="dot dot-1" />
+                        <span className="dot dot-2" />
+                        <span className="dot dot-3" />
+                        <span className="typing-text">croaking...</span>
+                    </div>
+                ) : (
+                    <div className="chat-message-text">
+                        {message}
+                        {isStreaming && <span className="stream-cursor">▌</span>}
+                    </div>
+                )}
             </div>
-            {sender === 'user' ? (
-                <img src={UserImg}
-                    className="chat-message-image" />
-            ) : null}
+            {!isFrog && (
+                <div className="avatar-container">
+                    <img src={UserImg} alt="You" className="chat-message-image" />
+                </div>
+            )}
         </div>
     );
 }
+
+export default ChatMessage;

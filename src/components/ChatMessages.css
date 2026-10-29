@@ -1,10 +1,82 @@
 .chat-messages-container {
     flex-grow: 1;
     width: 100%;
-    max-width: 800px;
+    max-width: 860px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 20px 24px;
     box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+.chat-messages-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages-container::-webkit-scrollbar-thumb {
+    background: rgba(46, 125, 50, 0.2);
+    border-radius: 4px;
+}
+
+.chat-messages-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(46, 125, 50, 0.4);
+}
+
+/* Empty Pond Welcome State */
+.empty-pond-state {
+    margin: auto;
+    text-align: center;
+    max-width: 520px;
+    padding: 36px 28px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px dashed rgba(76, 175, 80, 0.3);
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(34, 139, 34, 0.05);
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.empty-frog-icon img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #e8f5e9;
+    padding: 6px;
+    box-shadow: 0 6px 18px rgba(76, 175, 80, 0.2);
+    margin-bottom: 12px;
+}
+
+.empty-pond-state h2 {
+    color: #1b5e20;
+    font-size: 1.4rem;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.empty-pond-state p {
+    color: #33691e;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0 0 10px 0;
+}
+
+.empty-hint {
+    font-size: 0.85rem !important;
+    color: #689f38 !important;
+    font-style: italic;
+    background: #f1f8e9;
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-top: 14px !important;
 }
