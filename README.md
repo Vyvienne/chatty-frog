@@ -1,6 +1,28 @@
 # 🐸 Chatty Frog
 
-A friendly and interactive chatbot web application built with **React** and **Vite**. Chatty Frog can chat with you, answer nature trivia, flip coins, roll dice, and integrate with modern AI models such as **Google Gemini** or **OpenAI ChatGPT**.
+A friendly, delightful, and interactive chatbot web application built with **React**, **Vite**, and **WebLLM**.
+
+Chatty Frog runs **100% locally in your browser** using **WebGPU** — **no API keys, no external endpoints, and no server costs required!**
+
+---
+
+## 🌟 Key Features
+
+- **🧠 In-Browser AI with WebLLM**:
+  - Powered by **Qwen2.5-0.5B-Instruct** running client-side on your device's GPU.
+  - Model weights download directly into the browser cache and stay cached locally for instant future loads.
+- **🐸 Custom Frog Persona**:
+  - **Nature Scholar**: Deeply knowledgeable and passionate about animals, amphibians, insects, plants, pond ecology, the water cycle, and weather phenomena.
+  - **Clueless about Human Tech**: Innocently confused by modern human gadgets, the internet, slang, and office work (wondering if "the web" is a spider's silk trap or why humans don't just eat "software bugs").
+  - **Warm & Friendly**: Always greets you as a beloved pond visitor with cheerful croaks and pond humor.
+- **⚡ Real-time Token Streaming**:
+  - Responses stream in real-time as the in-browser model generates each word.
+- **🛡️ Robust Offline Fallback**:
+  - If WebGPU is not supported by the browser, Chatty Frog automatically runs in classic mode using its local regex patterns and nature knowledge base ([nature_knowledge.json](file:///public/nature_knowledge.json)).
+- **🎮 Built-in Minigames & Quick Actions**:
+  - Coin flips (`"Flip a coin"`)
+  - Dice rolls (`"Roll a dice"`)
+  - Date & nature trivia
 
 ---
 
@@ -8,13 +30,12 @@ A friendly and interactive chatbot web application built with **React** and **Vi
 
 ### Prerequisites
 
-Ensure you have [Node.js](https://nodejs.org/) (version 18+ recommended) and `npm` installed on your machine.
+- [Node.js](https://nodejs.org/) (v18+ recommended)
+- A modern browser with **WebGPU** support enabled (e.g., Google Chrome, Microsoft Edge, Brave, or Safari 18+).
 
 ---
 
 ### 1. Installation
-
-Clone or open the repository and install project dependencies:
 
 ```bash
 npm install
@@ -22,62 +43,29 @@ npm install
 
 ---
 
-### 2. Configure Environment Variables
+### 2. Run the Development Server
 
-1. Copy the sample environment file to create your local `.env`:
-
-   ```bash
-   # On Windows (PowerShell)
-   Copy-Item .env-test .env
-
-   # On macOS/Linux or Git Bash
-   cp .env-test .env
-   ```
-
-2. Open [.env](file:///.env) and insert your API key:
-   - **Google Gemini API Key**: Obtain one from [Google AI Studio](https://aistudio.google.com/) and set `VITE_GEMINI_API_KEY`.
-   - **OpenAI API Key**: Obtain one from [OpenAI Platform](https://platform.openai.com/) and set `VITE_OPENAI_API_KEY`.
-
-> [!NOTE]
-> `.env` is listed in `.gitignore` to prevent secret API keys from being committed to source control.
-
----
-
-### 3. Run the Development Server
-
-Start the local Vite development server:
+No API keys or `.env` configuration needed! Simply run:
 
 ```bash
 npm run dev
 ```
 
-Open your browser at the local URL shown in the terminal (usually `http://localhost:5173`).
+Open your browser at the local URL shown in your terminal (typically `http://localhost:5173`).
 
 ---
 
-## 💬 How to Use Chatty Frog
+## 💬 How It Works
 
-1. **Type a message** into the input box at the bottom.
-2. Press **Enter** or click the **Send** button.
-3. Chatty Frog will respond in real time!
-
-### Built-in Quick Actions:
-- **Greetings**: `"Hello"`, `"Hi"`, or `"Hey"`
-- **Mood**: `"How are you?"`
-- **Games**:
-  - `"Flip a coin"` &rarr; Flips heads or tails
-  - `"Roll a dice"` &rarr; Rolls a number from 1 to 6
-- **Date**: `"What is today's date?"`
-- **Nature Trivia**: Ask questions based on the built-in nature knowledge base.
-- **AI Chat**: When connected to Gemini or ChatGPT, ask Chatty Frog anything!
-
----
-
-## 🛠️ Other Available Scripts
-
-- **`npm run build`**: Build the optimized production bundle into the `dist/` folder.
-- **`npm run preview`**: Locally preview the production build.
-- **`npm run lint`**: Run ESLint to inspect code quality.
+1. When you open the app, WebLLM loads the lightweight **Qwen2.5-0.5B** model into your browser's local WebGPU cache. A status bar at the top displays download and compilation progress.
+2. Once loaded, the status badge turns green (`🟢 WebLLM Active • 100% Free & In-Browser`).
+3. Type a message or click one of the quick prompt suggestions:
+   - *"🌧️ Why does it rain?"*
+   - *"🦋 How do caterpillars become butterflies?"*
+   - *"💻 Chatty Frog, what is the internet?"*
+   - *"🪰 What is your favorite bug to eat?"*
+   - *"🪙 Flip a coin for me!"*
+4. Chatty Frog will respond in real time with its signature pond charm!
 
 ---
 
@@ -86,18 +74,35 @@ Open your browser at the local URL shown in the terminal (usually `http://localh
 ```text
 chatty-frog/
 ├── public/                 # Static assets (nature knowledge data, etc.)
+│   └── nature_knowledge.json
 ├── src/
 │   ├── assets/             # Images and icons (frog.png, user.png)
 │   ├── components/         # React components
-│   │   ├── ChatInput.jsx   # Input box & send logic
-│   │   ├── ChatMessage.jsx # Individual chat bubble
-│   │   ├── ChatMessages.jsx# Scrollable chat message list
-│   │   └── ChattyFrog.js   # Chatbot response engine & logic
-│   ├── App.jsx             # Main application component
+│   │   ├── ChatInput.jsx   # Input box, streaming trigger & send logic
+│   │   ├── ChatInput.css
+│   │   ├── ChatMessage.jsx # Message bubble with streaming cursor & typing indicator
+│   │   ├── ChatMessage.css
+│   │   ├── ChatMessages.jsx# Scrollable chat list with empty pond state
+│   │   ├── ChatMessages.css
+│   │   ├── ChattyFrog.js   # Response engine (WebLLM + local persona fallback)
+│   │   ├── Header.jsx      # Top bar with model download progress & prompt chips
+│   │   └── Header.css
+│   ├── services/
+│   │   └── webllmService.js# WebLLM engine singleton & nature persona prompt
+│   ├── App.jsx             # Main application orchestrator
+│   ├── App.css
 │   ├── main.jsx            # React root entry point
-│   └── styles.css          # Styling rules
-├── .env-test               # Example environment variables template
-├── .gitignore              # Git ignore rules (protects .env)
-├── package.json            # Project dependencies & scripts
+│   └── index.css           # Global pond-themed styles & typography
+├── index.html              # HTML shell with Google Fonts & SEO tags
+├── package.json            # Dependencies (@mlc-ai/web-llm, React, Vite)
 └── vite.config.js          # Vite build configuration
 ```
+
+---
+
+## 🛠️ Available Scripts
+
+- **`npm run dev`**: Start the Vite local development server.
+- **`npm run build`**: Build the optimized production bundle into `dist/`.
+- **`npm run preview`**: Locally preview the production build.
+- **`npm run lint`**: Run ESLint to check code quality.
