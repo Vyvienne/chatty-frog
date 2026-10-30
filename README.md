@@ -8,17 +8,24 @@ Chatty Frog runs **100% locally in your browser** using **WebGPU** — **no API 
 
 ## 🌟 Key Features
 
+- **📄 Document Upload & In-Browser Context Q&A**:
+  - Upload text documents (`.txt`, `.md`, `.csv`, `.json`) directly in the browser.
+  - Documents are chunked and indexed client-side; user queries retrieve the most relevant passages (via BM25-based keyword ranking) to inject as grounded context for WebLLM answers.
+- **📁 Document Manager Panel**:
+  - Circle button with file icon in the header displays uploaded files, upload timestamps, and file sizes.
+  - Easily remove uploaded documents or add more anytime.
+- **🌓 Light & Dark Mode**:
+  - One-click toggle between serene pond day and cozy pond night themes with persistent user preferences.
 - **🧠 In-Browser AI with WebLLM**:
   - Powered by **Qwen2.5-0.5B-Instruct** running client-side on your device's GPU.
   - Model weights download directly into the browser cache and stay cached locally for instant future loads.
 - **🐸 Custom Frog Persona**:
-  - **Nature Scholar**: Deeply knowledgeable and passionate about animals, amphibians, insects, plants, pond ecology, the water cycle, and weather phenomena.
-  - **Clueless about Human Tech**: Innocently confused by modern human gadgets, the internet, slang, and office work (wondering if "the web" is a spider's silk trap or why humans don't just eat "software bugs").
+  - **Document Scholar & Nature Guide**: Answers questions grounded in your uploaded documents, with warm amphibian cheer.
   - **Warm & Friendly**: Always greets you as a beloved pond visitor with cheerful croaks and pond humor.
 - **⚡ Real-time Token Streaming**:
   - Responses stream in real-time as the in-browser model generates each word.
 - **🛡️ Robust Offline Fallback**:
-  - If WebGPU is not supported by the browser, Chatty Frog automatically runs in classic mode using its local regex patterns and nature knowledge base ([nature_knowledge.json](file:///public/nature_knowledge.json)).
+  - If WebGPU is not supported by the browser, Chatty Frog automatically runs in classic mode using local document passage search, regex patterns, and nature knowledge base ([nature_knowledge.json](file:///public/nature_knowledge.json)).
 - **🎮 Built-in Minigames & Quick Actions**:
   - Coin flips (`"Flip a coin"`)
   - Dice rolls (`"Roll a dice"`)
@@ -57,15 +64,11 @@ Open your browser at the local URL shown in your terminal (typically `http://loc
 
 ## 💬 How It Works
 
-1. When you open the app, WebLLM loads the lightweight **Qwen2.5-0.5B** model into your browser's local WebGPU cache. A status bar at the top displays download and compilation progress.
-2. Once loaded, the status badge turns green (`🟢 WebLLM Active • 100% Free & In-Browser`).
-3. Type a message or click one of the quick prompt suggestions:
-   - *"🌧️ Why does it rain?"*
-   - *"🦋 How do caterpillars become butterflies?"*
-   - *"💻 Chatty Frog, what is the internet?"*
-   - *"🪰 What is your favorite bug to eat?"*
-   - *"🪙 Flip a coin for me!"*
-4. Chatty Frog will respond in real time with its signature pond charm!
+1. When you open the app, WebLLM loads the lightweight **Qwen2.5-0.5B** model into your browser's local WebGPU cache.
+2. Click **[Upload]** on the pond landing page or the file icon in the header to upload text documents (`.txt`, `.md`, `.csv`, `.json`).
+3. Click the circle file icon beside the theme toggle in the header to view uploaded files, their upload timestamps, and file sizes.
+4. Toggle between Light and Dark mode using the circle sun/moon button in the top right.
+5. Ask Chatty Frog questions about your uploaded documents or chat about nature, pond life, and minigames!
 
 ---
 
@@ -82,18 +85,20 @@ chatty-frog/
 │   │   ├── ChatInput.css
 │   │   ├── ChatMessage.jsx # Message bubble with streaming cursor & typing indicator
 │   │   ├── ChatMessage.css
-│   │   ├── ChatMessages.jsx# Scrollable chat list with empty pond state
+│   │   ├── ChatMessages.jsx# Scrollable chat list with empty pond state & upload button
 │   │   ├── ChatMessages.css
-│   │   ├── ChattyFrog.js   # Response engine (WebLLM + local persona fallback)
-│   │   ├── Header.jsx      # Top bar with model download progress & prompt chips
+│   │   ├── ChattyFrog.js   # BM25 document chunking/search & persona engine
+│   │   ├── DocumentsPanel.jsx # Popover listing uploaded documents, timestamps & sizes
+│   │   ├── DocumentsPanel.css
+│   │   ├── Header.jsx      # Top bar with document manager & dark mode toggle
 │   │   └── Header.css
 │   ├── services/
-│   │   └── webllmService.js# WebLLM engine singleton & nature persona prompt
-│   ├── App.jsx             # Main application orchestrator
+│   │   └── webllmService.js# WebLLM engine singleton & document Q&A prompt
+│   ├── App.jsx             # Main application orchestrator (theme & docs state)
 │   ├── App.css
 │   ├── main.jsx            # React root entry point
-│   └── index.css           # Global pond-themed styles & typography
-├── index.html              # HTML shell with Google Fonts & SEO tags
+│   └── index.css           # Global pond-themed styles & dark mode definitions
+├── index.html              # HTML shell with Google Fonts, SEO tags & theme loader
 ├── package.json            # Dependencies (@mlc-ai/web-llm, React, Vite)
 └── vite.config.js          # Vite build configuration
 ```
