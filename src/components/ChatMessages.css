@@ -71,12 +71,56 @@
     margin: 0 0 10px 0;
 }
 
-.empty-hint {
-    font-size: 0.85rem !important;
-    color: #689f38 !important;
-    font-style: italic;
-    background: #f1f8e9;
-    padding: 10px 14px;
-    border-radius: 12px;
-    margin-top: 14px !important;
+.upload-button {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 26px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #43a047, #2e7d32);
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(46, 125, 50, 0.28);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.upload-button svg {
+    width: 18px;
+    height: 18px;
+}
+
+.upload-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(46, 125, 50, 0.38);
+}
+
+.upload-button:active {
+    transform: translateY(0);
+}
+
+/* Dark mode */
+[data-theme="dark"] .empty-pond-state {
+    background: rgba(22, 36, 29, 0.75);
+    border-color: rgba(129, 199, 132, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .empty-frog-icon img {
+    background: #1e3326;
+}
+
+[data-theme="dark"] .empty-pond-state h2 {
+    color: #a5d6a7;
+}
+
+[data-theme="dark"] .empty-pond-state p {
+    color: #c5e1c8;
+}
+
+[data-theme="dark"] .chat-messages-container::-webkit-scrollbar-thumb {
+    background: rgba(129, 199, 132, 0.2);
 }

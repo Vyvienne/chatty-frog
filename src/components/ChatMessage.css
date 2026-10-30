@@ -152,3 +152,27 @@
         opacity: 1;
     }
 }
+
+/* Dark mode */
+[data-theme="dark"] .chat-message-image {
+    background: #1e3326;
+}
+
+[data-theme="dark"] .bubble-frog {
+    background: #1a2b22;
+    color: #e3f1e6;
+    border-color: rgba(129, 199, 132, 0.2);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .bubble-frog .sender-tag {
+    color: #81c784;
+}
+
+[data-theme="dark"] .bubble-user {
+    background: linear-gradient(135deg, #388e3c 0%, #1b5e20 100%);
+}
+
+[data-theme="dark"] .typing-text {
+    color: #9ccc9f;
+}
