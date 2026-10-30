@@ -1,20 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Chattyfrog } from './ChattyFrog.js';
 import './ChatInput.css';
 
-export function ChatInput({ chatMessages, setChatMessages, isGenerating, setIsGenerating, prefillInput }) {
+export function ChatInput({ chatMessages, setChatMessages, isGenerating, setIsGenerating }) {
     const [inputText, setInputText] = useState('');
     const inputRef = useRef(null);
-
-    // If a suggestion chip is clicked from the Header
-    useEffect(() => {
-        if (prefillInput) {
-            setInputText(prefillInput);
-            if (inputRef.current) {
-                inputRef.current.focus();
-            }
-        }
-    }, [prefillInput]);
 
     function handleInputChange(event) {
         setInputText(event.target.value);
@@ -123,9 +113,6 @@ export function ChatInput({ chatMessages, setChatMessages, isGenerating, setIsGe
                         </svg>
                     )}
                 </button>
-            </div>
-            <div className="input-footer-hint">
-                <span>Press <strong>Enter</strong> to send • Free & local WebGPU in your browser</span>
             </div>
         </div>
     );

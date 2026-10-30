@@ -28,6 +28,18 @@ RESPONSE FORMAT:
 - Stay in character as Chatty Frog at all times.
 - Keep answers concise, cozy, and engaging (usually 2 to 4 sentences), unless the user specifically asks for a detailed nature explanation.`;
 
+export const DOCUMENT_QA_SYSTEM_PROMPT = `You are Chatty Frog, a friendly and helpful frog assistant who answers questions about documents the user has uploaded.
+
+RULES:
+1. Base every answer on the DOCUMENT EXCERPTS provided with the question. Do not invent facts that are not in them.
+2. The documents may cover any subject (including technology, business, or science). Answer them accurately and clearly - do not pretend to be confused by the topic.
+3. If the excerpts do not contain the answer, say so honestly, e.g. "*Ribbit...* I couldn't find that in your documents."
+4. When useful, mention which document the answer came from (shown as [Source: ...]).
+5. For summaries, cover the main points in a short list or a few sentences.
+
+TONE:
+- Warm and friendly. You may add a light "*Ribbit!*" now and then, but keep the focus on a clear, correct answer.`;
+
 class WebLLMService {
     constructor() {
         this.engine = null;
@@ -136,23 +148,40 @@ class WebLLMService {
      * Generate response with streaming callback
      * @param {Array<{role: string, content: string}>} conversationHistory 
      * @param {Function} onStreamDelta (deltaText, fullAccumulatedText) => void
+     * @param {string} [documentContext] Relevant excerpts retrieved from user-uploaded documents
      * @returns {Promise<string>}
      */
-    async generateResponse(conversationHistory, onStreamDelta) {
+    async generateResponse(conversationHistory, onStreamDelta, documentContext = "") {
         if (!this.engine || !this.isReady) {
             throw new Error("WebLLM engine is not initialized.");
         }
 
-        const messages = [
-            { role: "system", content: CHATTY_FROG_SYSTEM_PROMPT },
-            ...conversationHistory.slice(-10) // Keep recent context
-        ];
+        let messages;
+        if (documentContext) {
+            // Document mode: keep history short so the excerpts fit the model's context window,
+            // and attach the excerpts directly to the latest question.
+            const history = conversationHistory.slice(-5);
+            const last = history.pop();
+            messages = [
+                { role: "system", content: DOCUMENT_QA_SYSTEM_PROMPT },
+                ...history,
+                {
+                    role: "user",
+                    content: `DOCUMENT EXCERPTS:\n${documentContext}\n\nQUESTION: ${last?.content ?? ""}\n\nAnswer the question using only the document excerpts above.`
+                }
+            ];
+        } else {
+            messages = [
+                { role: "system", content: CHATTY_FROG_SYSTEM_PROMPT },
+                ...conversationHistory.slice(-10) // Keep recent context
+            ];
+        }
 
         try {
             const asyncStream = await this.engine.chat.completions.create({
                 messages,
-                temperature: 0.7,
-                max_tokens: 350,
+                temperature: documentContext ? 0.2 : 0.7,
+                max_tokens: documentContext ? 450 : 350,
                 stream: true,
             });
 
